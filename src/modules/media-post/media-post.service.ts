@@ -12,6 +12,6 @@ export class MediaPostService {
   ) {}
 
   async findAll() {
-    return await this.mediaPostRepository.getAll();
+    return 'all posts';
   }
 }
