@@ -9,6 +9,12 @@ export class UserService {
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
   ) {}
 
+  async setCurrentRefreshToken(refreshToken: string, userId: number) {
+    return await this.userRepository.setCurrentRefreshToken(
+      refreshToken,
+      userId,
+    );
+  }
   async getById(id: number) {
     return await this.userRepository.getById(id);
   }

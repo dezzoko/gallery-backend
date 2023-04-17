@@ -9,13 +9,14 @@ generator client {
 }
 
 model User {
-    id           Int               @id @default(autoincrement())
-    email        String            @unique
-    name         String
-    password     String
-    surname      String?
-    MediaPost    MediaPost[]
-    blockedPosts BlockedUserPost[]
+    id                        Int               @id @default(autoincrement())
+    email                     String            @unique
+    name                      String
+    password                  String
+    surname                   String?
+    currentHashedRefreshToken String?
+    MediaPost                 MediaPost[]
+    blockedPosts              BlockedUserPost[]
 }
 
 model MediaPost {

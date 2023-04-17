@@ -1,11 +1,43 @@
 import { comparePassword, hashPasword } from 'src/common/utils/bcrypt';
 import { UserService } from '../user/user.service';
 import { SignupDto } from './dto/sign-up.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { UserEntity } from '../user/entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
+import TokenPayload from 'src/common/interfaces/token-payload';
+import { ConfigService } from '@nestjs/config';
 
 export class AuthService {
-  constructor(private readonly usersService: UserService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly usersService: UserService,
+    private readonly configService: ConfigService,
+  ) {}
+  public getCookieWithJwtAccessToken(userId: number) {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('auth.secretAccessToken'),
+      expiresIn: `${this.configService.get('auth.accessTokenExpiresIn')}s`,
+    });
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+      'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+    )}`;
+  }
+
+  public getCookieWithJwtRefreshToken(userId: number) {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('auth.secretRefreshToken'),
+      expiresIn: `${this.configService.get('auth.refreshTokenExpiresIn')}s`,
+    });
+    const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+      'auth.refreshTokenExpiresIn',
+    )}`;
+    return {
+      cookie,
+      token,
+    };
+  }
 
   public async signUp(signUpDto: SignupDto) {
     const hashedPassword = await hashPasword(signUpDto.password);
@@ -41,6 +73,9 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+  public getCookieForLogOut() {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 
   private verifyPassword(plainTextPassword: string, hashedPassword: string) {
