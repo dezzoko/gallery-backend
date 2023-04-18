@@ -27,9 +27,11 @@ export class UserRepository {
   }
   async setCurrentRefreshToken(refreshToken: string, userId: number) {
     const currentHashedRefreshToken = await hashPasword(refreshToken);
+    console.log(currentHashedRefreshToken);
+
     await this.prismaService.user.update({
       where: { id: userId },
-      data: currentHashedRefreshToken,
+      data: { currentHashedRefreshToken },
     });
   }
 

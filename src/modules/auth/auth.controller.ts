@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
   Req,
@@ -13,6 +14,9 @@ import { LocalAuthGuard } from 'src/common/guards/localAuth.guard';
 import RequestWithUser from 'src/common/interfaces/request-with-user';
 import { Response } from 'express';
 import { UserService } from '../user/user.service';
+import { NoAuth } from 'src/common/decorators/no-auth.decorator';
+import { PostgresErrorCode } from 'prisma/postgresErrorCodes.enum';
+import JwtRefreshGuard from 'src/common/guards/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -20,10 +24,18 @@ export class AuthController {
     private readonly authService: AuthService,
     private userService: UserService,
   ) {}
+  @NoAuth()
+  @Post('register')
+  async register(@Body() signUpDto: SignupDto) {
+    console.log('123');
+
+    return await this.authService.signUp(signUpDto);
+  }
 
   @HttpCode(200)
+  @NoAuth()
   @UseGuards(LocalAuthGuard)
-  @Post('log-in')
+  @Post('login')
   async login(@Req() request: RequestWithUser) {
     const { user } = request;
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
@@ -41,23 +53,21 @@ export class AuthController {
     ]);
     return user;
   }
+  @NoAuth()
+  @UseGuards(JwtRefreshGuard)
+  @Get('refresh')
+  refresh(@Req() request: RequestWithUser) {
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
+      request.user.id,
+    );
+
+    request.res.setHeader('Set-Cookie', accessTokenCookie);
+    return request.user;
+  }
 
   @Post('logout')
-  async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
+  async logout(@Req() request: RequestWithUser, @Res() response: Response) {
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
     return response.sendStatus(200);
-  }
-  @Post('register')
-  async register(@Body() signUpDto: SignupDto) {
-    return this.authService.signUp(signUpDto);
-  }
-
-  @HttpCode(200)
-  @UseGuards(LocalAuthGuard)
-  @Post('login')
-  async logIn(@Req() request: RequestWithUser) {
-    const user = request.user;
-    user.password = undefined;
-    return user;
   }
 }

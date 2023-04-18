@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { USER_REPOSITORY } from 'src/common/constants/tokens';
 import { CreateUserDto } from './dto/create-user.dto';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,18 @@ export class UserService {
     return await this.userRepository.getByEmail(email);
   }
 
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    const user = await this.userRepository.getById(userId);
+
+    const isRefreshTokenMatching = await compare(
+      refreshToken,
+      user.currentHashedRefreshToken,
+    );
+
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+  }
   async createUser(createUserDto: CreateUserDto) {
     return await this.userRepository.create(createUserDto);
   }
