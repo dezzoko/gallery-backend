@@ -9,7 +9,11 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(
-    new RemoveFieldsInterceptor(['password', 'currentHashedRefreshToken']),
+    new RemoveFieldsInterceptor([
+      'password',
+      'currentHashedRefreshToken',
+      'isBlocked',
+    ]),
   );
   await app.listen(3000);
 }

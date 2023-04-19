@@ -28,6 +28,8 @@ model MediaPost {
     creatorId    Int
     isBlocked    Boolean           @default(false)
     blockedUsers BlockedUserPost[]
+
+    @@map("mediaPost")
 }
 
 model BlockedUserPost {
@@ -36,4 +38,6 @@ model BlockedUserPost {
     blockedId   Int
     MediaPost   MediaPost @relation(fields: [mediaPostId], references: [id])
     mediaPostId Int
+
+    @@map("blockedUserPost")
 }

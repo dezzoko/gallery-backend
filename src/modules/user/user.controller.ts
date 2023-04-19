@@ -8,7 +8,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   @Get('self')
   async getSelf(@Req() req: RequestWithUser) {
-    return req.user;
+    return this.userService.getById(req.user.id);
   }
   @Get('')
   async get() {

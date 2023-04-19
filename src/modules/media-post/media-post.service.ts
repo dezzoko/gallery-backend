@@ -12,6 +12,13 @@ export class MediaPostService {
   ) {}
 
   async findAll() {
-    return 'all posts';
+    return await this.mediaPostRepository.getAll();
+  }
+  async findSelfPost(userId: number) {
+    return await this.mediaPostRepository.getSelfUserPosts(userId);
+  }
+
+  async findByUserId(userId: number) {
+    return await this.mediaPostRepository.getByUserId(userId);
   }
 }

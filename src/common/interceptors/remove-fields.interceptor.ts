@@ -25,9 +25,18 @@ export class RemoveFieldsInterceptor implements NestInterceptor {
     );
   }
 
-  private removeFieldsFromItem(item: any) {
-    const result = { ...item };
-    this.fieldsToRemove.forEach((field) => delete result[field]);
-    return result;
+  private removeFieldsFromItem(body: any) {
+    if (typeof body !== 'object' || body === null) {
+      return;
+    }
+
+    for (const key in body) {
+      if (this.fieldsToRemove.includes(key)) {
+        delete body[key];
+      } else {
+        this.removeFieldsFromItem(body[key]); // Рекурсивный вызов для свойств
+      }
+    }
+    return body;
   }
 }

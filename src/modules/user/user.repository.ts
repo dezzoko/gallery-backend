@@ -12,6 +12,9 @@ export class UserRepository {
       where: {
         id: id,
       },
+      include: {
+        MediaPost: true,
+      },
     });
   }
   async getAll() {
