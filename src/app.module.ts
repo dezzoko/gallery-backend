@@ -5,6 +5,8 @@ import { UserModule } from './modules/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import authConfig from './config/auth.config';
 import { AuthModule } from './modules/auth/auth.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { RemoveNullValuesInterceptor } from './common/interceptors/remove-null-fields.interceptor';
 
 @Module({
   imports: [
@@ -19,6 +21,11 @@ import { AuthModule } from './modules/auth/auth.module';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RemoveNullValuesInterceptor,
+    },
+  ],
 })
 export class AppModule {}

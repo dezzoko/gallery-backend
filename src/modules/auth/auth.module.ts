@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { JWT_SERVICE } from 'src/common/constants/tokens';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { APP_GUARD } from '@nestjs/core/constants';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core/constants';
 import { JwtRefreshStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
