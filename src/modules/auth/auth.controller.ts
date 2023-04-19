@@ -27,8 +27,6 @@ export class AuthController {
   @NoAuth()
   @Post('register')
   async register(@Body() signUpDto: SignupDto) {
-    console.log('123');
-
     return await this.authService.signUp(signUpDto);
   }
 

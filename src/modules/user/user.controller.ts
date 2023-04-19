@@ -1,13 +1,21 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import RequestWithUser from 'src/common/interfaces/request-with-user';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  @Get('self')
+  async getSelf(@Req() req: RequestWithUser) {
+    return req.user;
+  }
+  @Get('')
+  async get() {
+    return await this.userService.getAll();
+  }
   @Get(':id')
-  async get(@Param('id') id: string) {
+  async getOne(@Param('id') id: string) {
     return await this.userService.getById(+id);
   }
 

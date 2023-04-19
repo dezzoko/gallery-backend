@@ -5,6 +5,7 @@ export class UserEntity {
     public surname: string,
     public email: string,
     public password: string,
+    public currentHashedRefreshToken: string,
   ) {}
 
   static fromObject(object: any) {
@@ -18,11 +19,12 @@ export class UserEntity {
     }
 
     return new UserEntity(
-      object.id || object._id,
-      object?.surname,
+      object.id,
       object.name,
+      object?.surname,
       object.email,
       object.password,
+      object?.currentHashedRefreshToken,
     );
   }
 }

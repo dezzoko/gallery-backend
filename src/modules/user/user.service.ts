@@ -20,7 +20,7 @@ export class UserService {
     return await this.userRepository.getById(id);
   }
 
-  async getByEmail(email) {
+  async getByEmail(email: string) {
     return await this.userRepository.getByEmail(email);
   }
 
@@ -35,6 +35,10 @@ export class UserService {
     if (isRefreshTokenMatching) {
       return user;
     }
+  }
+
+  async getAll() {
+    return await this.userRepository.getAll();
   }
   async createUser(createUserDto: CreateUserDto) {
     return await this.userRepository.create(createUserDto);

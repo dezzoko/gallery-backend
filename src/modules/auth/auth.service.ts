@@ -44,8 +44,6 @@ export class AuthService {
   }
 
   public async signUp(signUpDto: SignupDto) {
-    // console.log(this.userService);
-
     const hashedPassword = await hashPasword(signUpDto.password);
     delete signUpDto.confirmPassword;
     try {
