@@ -6,6 +6,7 @@ export class UserEntity {
     public email: string,
     public password: string,
     public currentHashedRefreshToken: string,
+    public roles: string[],
   ) {}
 
   static fromObject(object: any) {
@@ -17,7 +18,8 @@ export class UserEntity {
     ) {
       throw new Error('cannot create UserEntity from object');
     }
-
+    let roles: string[];
+    if (object.roles) roles = object.roles.map((role) => role.roleName);
     return new UserEntity(
       object.id,
       object.name,
@@ -25,6 +27,7 @@ export class UserEntity {
       object.email,
       object.password,
       object?.currentHashedRefreshToken,
+      roles,
     );
   }
 }

@@ -2,20 +2,24 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { hashPasword } from 'src/common/utils/bcrypt';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getById(id: number) {
-    return await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id: id,
       },
       include: {
-        MediaPost: true,
+        roles: true,
       },
     });
+    console.log(user.roles);
+
+    return UserEntity.fromObject(user);
   }
   async getAll() {
     return await this.prismaService.user.findMany();
@@ -42,8 +46,21 @@ export class UserRepository {
   }
 
   async create(createUserDto: CreateUserDto) {
-    return await this.prismaService.user.create({
-      data: createUserDto,
+    const internalRole = await this.prismaService.roles.findUnique({
+      where: {
+        roleName: 'INTERNAL_USER',
+      },
     });
+    const user = await this.prismaService.user.create({
+      data: {
+        ...createUserDto,
+        roles: {
+          connect: {
+            id: internalRole.id,
+          },
+        },
+      },
+    });
+    return user;
   }
 }
