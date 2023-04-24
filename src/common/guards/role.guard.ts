@@ -17,19 +17,19 @@ export class RolesGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    try {
-      const requiredRoles = this.reflector.getAllAndOverride<string[]>(
-        ROLES_KEY,
-        [context.getHandler(), context.getClass()],
-      );
+    const req: RequestWithUser = context.switchToHttp().getRequest();
+    const user = req.user;
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (!requiredRoles) return true;
 
-      const req: RequestWithUser = context.switchToHttp().getRequest();
-      const user = req.user;
-      console.log(user);
+    if (requiredRoles.includes('NO_CONFIRMED_EMAIL')) return true;
+    if (!user.roles.includes('EMAIL_CONFIRMED')) return false;
 
-      return user.roles.some((role) => requiredRoles.includes(role));
-    } catch (e) {
-      throw new HttpException('Forbidden by Role', HttpStatus.FORBIDDEN);
-    }
+    return requiredRoles.reduce((prev, cur) => {
+      return prev && user.roles.includes(cur);
+    }, true);
   }
 }

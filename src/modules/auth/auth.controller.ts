@@ -16,16 +16,19 @@ import { Response } from 'express';
 import { UserService } from '../user/user.service';
 import { NoAuth } from 'src/common/decorators/no-auth.decorator';
 import JwtRefreshGuard from 'src/common/guards/jwt-refresh.guard';
+import { MailingService } from '../mailing/mailing.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly mailingService: MailingService,
   ) {}
   @NoAuth()
   @Post('register')
   async register(@Body() signUpDto: SignupDto) {
+    await this.mailingService.sendVerificationLink(signUpDto.email);
     return await this.authService.signUp(signUpDto);
   }
 

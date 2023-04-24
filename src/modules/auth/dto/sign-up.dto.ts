@@ -18,7 +18,6 @@ export class SignupDto {
 
   @IsEmail()
   @MinLength(5)
-  @MaxLength(30)
   email: string;
 
   @MinLength(8)

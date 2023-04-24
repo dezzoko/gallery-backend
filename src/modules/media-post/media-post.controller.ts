@@ -12,8 +12,6 @@ export class MediaPostController {
   async findAll() {
     return await this.mediaPostService.findAll();
   }
-  @Roles('ADMIN')
-  @UseGuards(RolesGuard)
   @Get('self-posts')
   async getSelfPosts(@Req() req: RequestWithUser) {
     return await this.mediaPostService.findSelfPost(req.user.id);
