@@ -52,11 +52,8 @@ export class AuthService {
         password: hashedPassword,
       });
 
-      createdUser.password = undefined;
       return createdUser;
     } catch (error) {
-      console.log(error.code);
-
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new HttpException(
           'User with that email already exists',

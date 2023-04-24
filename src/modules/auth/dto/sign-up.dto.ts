@@ -23,7 +23,7 @@ export class SignupDto {
 
   @MinLength(8)
   @MaxLength(30)
-  @IsStrongPassword()
+  // @IsStrongPassword()
   password: string;
 
   @MinLength(8)

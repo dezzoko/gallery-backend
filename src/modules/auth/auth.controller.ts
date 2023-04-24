@@ -15,14 +15,13 @@ import RequestWithUser from 'src/common/interfaces/request-with-user';
 import { Response } from 'express';
 import { UserService } from '../user/user.service';
 import { NoAuth } from 'src/common/decorators/no-auth.decorator';
-import { PostgresErrorCode } from 'prisma/postgresErrorCodes.enum';
 import JwtRefreshGuard from 'src/common/guards/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private userService: UserService,
+    private readonly userService: UserService,
   ) {}
   @NoAuth()
   @Post('register')

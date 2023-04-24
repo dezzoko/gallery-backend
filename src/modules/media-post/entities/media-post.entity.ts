@@ -19,10 +19,10 @@ export class MediaPostEntity {
     ) {
       throw new Error('cannot make MediaPostEntity from object');
     }
-
     let user;
 
     if (object.creator) user = UserEntity.fromObject(object.creator);
+
     return new MediaPostEntity(
       object.id,
       object.title,

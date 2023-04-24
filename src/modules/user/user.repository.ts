@@ -22,7 +22,19 @@ export class UserRepository {
     return UserEntity.fromObject(user);
   }
   async getAll() {
-    return await this.prismaService.user.findMany();
+    const users = await this.prismaService.user.findMany({
+      include: {
+        roles: {
+          select: {
+            roleName: true,
+          },
+        },
+      },
+    });
+    const userEntities = users.map((user) => UserEntity.fromObject(user));
+    console.log(userEntities);
+
+    return userEntities;
   }
 
   async getByEmail(email: string) {
@@ -60,7 +72,11 @@ export class UserRepository {
           },
         },
       },
+      include: {
+        roles: true,
+      },
     });
-    return user;
+
+    return UserEntity.fromObject(user);
   }
 }

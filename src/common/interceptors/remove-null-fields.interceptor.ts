@@ -32,15 +32,27 @@ export class RemoveNullValuesInterceptor implements NestInterceptor {
 
   private filterObject(obj: Record<string, any>): Record<string, any> {
     const result = {};
-    for (const [key, value] of Object.entries(obj)) {
-      if (value !== null) {
-        if (typeof value === 'object') {
-          result[key] = this.filterObject(value);
-        } else {
-          result[key] = value;
+    if (!Array.isArray(obj)) {
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== null) {
+          if (typeof value === 'object') {
+            result[key] = this.filterObject(value);
+          } else {
+            result[key] = value;
+          }
         }
       }
+    } else {
+      return obj
+        .filter((item) => item !== null)
+        .map((item) => {
+          if (typeof item === 'object') {
+            return this.filterObject(item);
+          }
+          return item;
+        });
     }
+
     return result;
   }
 }
