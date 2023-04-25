@@ -14,9 +14,9 @@ import { LocalAuthGuard } from 'src/common/guards/localAuth.guard';
 import RequestWithUser from 'src/common/interfaces/request-with-user';
 import { Response } from 'express';
 import { UserService } from '../user/user.service';
-import { NoAuth } from 'src/common/decorators/no-auth.decorator';
 import JwtRefreshGuard from 'src/common/guards/jwt-refresh.guard';
 import { MailingService } from '../mailing/mailing.service';
+import { NoJwtAuth } from 'src/common/decorators/no-auth.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +25,7 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly mailingService: MailingService,
   ) {}
-  @NoAuth()
+  @NoJwtAuth()
   @Post('register')
   async register(@Body() signUpDto: SignupDto) {
     await this.mailingService.sendVerificationLink(signUpDto.email);
@@ -33,7 +33,7 @@ export class AuthController {
   }
 
   @HttpCode(200)
-  @NoAuth()
+  @NoJwtAuth()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() request: RequestWithUser) {
@@ -53,7 +53,7 @@ export class AuthController {
     ]);
     return user;
   }
-  @NoAuth()
+  @NoJwtAuth()
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
   refresh(@Req() request: RequestWithUser) {

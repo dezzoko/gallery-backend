@@ -4,6 +4,7 @@ export class UserEntity {
     public name: string,
     public surname: string,
     public email: string,
+    public password: string,
     public currentHashedRefreshToken: string,
     public roles: string[],
   ) {}
@@ -25,6 +26,7 @@ export class UserEntity {
       object.name,
       object?.surname,
       object.email,
+      object.password,
       object?.currentHashedRefreshToken,
       roles,
     );

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { MediaPostModule } from './modules/media-post/media-post.module';
 import { UserModule } from './modules/user/user.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import authConfig from './config/auth.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -13,7 +13,6 @@ import { MailingController } from './modules/mailing/mailing.controller';
 import { MailingService } from './modules/mailing/mailing.service';
 import { MailingModule } from './modules/mailing/mailing.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [

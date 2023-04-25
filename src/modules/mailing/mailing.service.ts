@@ -49,12 +49,26 @@ export class MailingService {
     this.mailerService.addTransporter('gmail', config);
   }
 
+  public async verificateEmail(email: string) {
+    const user = await this.userService.getByEmail(email);
+    if (!user) throw new BadRequestException('There isnt such user');
+    try {
+      this.userService.addRoleToUser({
+        userId: user.id,
+        roleName: 'EMAIL_CONFIRMED',
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
   public sendVerificationLink(email: string) {
     const token = this.jwtService.sign(
       { email },
       {
         secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
-        expiresIn: this.configService.get('auth.accessTokenExpiresIn'),
+        expiresIn: this.configService.get(
+          'JWT_VERIFICATION_TOKEN_EXPIRATION_TIME',
+        ),
       },
     );
 
@@ -101,18 +115,11 @@ export class MailingService {
   }
   public async sendMail(sendMailDto: SendMailDto) {
     await this.setTransport();
-    this.mailerService
-      .sendMail({
-        transporterName: 'gmail',
-        to: sendMailDto.to, // list of receivers
-        subject: sendMailDto.subject, // Subject line
-        text: sendMailDto.text,
-      })
-      .then((success) => {
-        console.log(success);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    this.mailerService.sendMail({
+      transporterName: 'gmail',
+      to: sendMailDto.to,
+      subject: sendMailDto.subject,
+      text: sendMailDto.text,
+    });
   }
 }

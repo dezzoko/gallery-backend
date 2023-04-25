@@ -1,8 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
-  HttpException,
-  HttpStatus,
+  ForbiddenException,
   Injectable,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -23,13 +22,18 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
+
     if (!requiredRoles) return true;
+    if (
+      !requiredRoles.reduce((prev, cur) => {
+        return prev && user.roles.includes(cur);
+      }, true)
+    )
+      throw new ForbiddenException({
+        message: 'Permission denied',
+        roles: requiredRoles.filter((role) => !user.roles.includes(role)),
+      });
 
-    if (requiredRoles.includes('NO_CONFIRMED_EMAIL')) return true;
-    if (!user.roles.includes('EMAIL_CONFIRMED')) return false;
-
-    return requiredRoles.reduce((prev, cur) => {
-      return prev && user.roles.includes(cur);
-    }, true);
+    return true;
   }
 }

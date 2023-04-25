@@ -3,6 +3,7 @@ import { UserRepository } from './user.repository';
 import { USER_REPOSITORY } from 'src/common/constants/tokens';
 import { CreateUserDto } from './dto/create-user.dto';
 import { compare } from 'bcrypt';
+import { AddRoleToUserDto } from './dto/addRoleToUserDto.dto';
 
 @Injectable()
 export class UserService {
@@ -40,6 +41,14 @@ export class UserService {
   async getAll() {
     return await this.userRepository.getAll();
   }
+
+  async addRoleToUser(addRoleToUserDto: AddRoleToUserDto) {
+    return await this.userRepository.addRoleToUser(
+      addRoleToUserDto.userId,
+      addRoleToUserDto.roleName,
+    );
+  }
+
   async createUser(createUserDto: CreateUserDto) {
     return await this.userRepository.create(createUserDto);
   }

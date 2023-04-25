@@ -1,7 +1,7 @@
 import { comparePassword, hashPasword } from 'src/common/utils/bcrypt';
 import { UserService } from '../user/user.service';
 import { SignupDto } from './dto/sign-up.dto';
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserEntity } from '../user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import TokenPayload from 'src/common/interfaces/token-payload';
