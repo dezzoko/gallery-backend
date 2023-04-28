@@ -9,14 +9,30 @@ export class MediaPostService {
     private readonly mediaPostRepository: MediaPostRepository,
   ) {}
 
-  async findAll() {
-    return await this.mediaPostRepository.getAll();
+  async findAll(page?: number, limit?: number) {
+    return await this.mediaPostRepository.getAll(page, limit);
   }
-  async findSelfPost(userId: number) {
-    return await this.mediaPostRepository.getSelfUserPosts(userId);
+  async findSelfPost(userId: number, page?: number, limit?: number) {
+    return await this.mediaPostRepository.getSelfUserPosts(userId, page, limit);
   }
 
   async findByUserId(userId: number) {
     return await this.mediaPostRepository.getByUserId(userId);
+  }
+
+  async blockMediaPost(mediaPostId: number, userId: number) {
+    return await this.mediaPostRepository.blockMediaPost(mediaPostId, userId);
+  }
+
+  async blockPostForUser(
+    mediaPostId: number,
+    blockedUserId: number,
+    creatorId: number,
+  ) {
+    return await this.mediaPostRepository.blockPostForUser(
+      mediaPostId,
+      blockedUserId,
+      creatorId,
+    );
   }
 }

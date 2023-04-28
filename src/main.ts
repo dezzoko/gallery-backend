@@ -7,13 +7,9 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalInterceptors(
-    new RemoveFieldsInterceptor([
-      'password',
-      'currentHashedRefreshToken',
-      'isBlocked',
-    ]),
+    new RemoveFieldsInterceptor(['password', 'currentHashedRefreshToken']),
   );
   await app.listen(3000);
 }

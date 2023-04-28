@@ -3,6 +3,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { hashPasword } from 'src/common/utils/bcrypt';
 import { UserEntity } from './entities/user.entity';
+import { calculatePagination } from 'src/common/utils/calculatePagination';
+import { MediaPostEntity } from '../media-post/entities/media-post.entity';
+import { RolesEnum } from 'src/common/enums/roles.enum';
 
 @Injectable()
 export class UserRepository {
@@ -42,19 +45,35 @@ export class UserRepository {
     }
   }
 
-  async getAll() {
-    const users = await this.prismaService.user.findMany({
-      include: {
-        roles: {
-          select: {
-            roleName: true,
+  async getAll(page?: number, limit?: number) {
+    const { take, skip } = calculatePagination(limit, page);
+
+    const [users, total] = await Promise.all([
+      await this.prismaService.user.findMany({
+        skip,
+        take,
+        include: {
+          roles: {
+            select: {
+              roleName: true,
+            },
           },
         },
-      },
-    });
-    const userEntities = users.map((user) => UserEntity.fromObject(user));
+      }),
+      this.prismaService.user.count(),
+    ]);
+    const totalPages = Math.ceil(total / limit);
+    if (!users.length) {
+      return [];
+    }
 
-    return userEntities;
+    return {
+      users: users.map((user) => UserEntity.fromObject(user)),
+      page,
+      limit,
+      total,
+      totalPages,
+    };
   }
 
   async getByEmail(email: string) {
@@ -89,7 +108,7 @@ export class UserRepository {
       },
     });
 
-    this.addRoleToUser(user.id, 'INTERNAL_USER');
+    this.addRoleToUser(user.id, RolesEnum.INTERNAL_USER);
     return UserEntity.fromObject(user);
   }
 }

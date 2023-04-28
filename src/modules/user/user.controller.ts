@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import RequestWithUser from 'src/common/interfaces/request-with-user';
+import { PaginationParams } from 'src/common/interfaces/pagination';
 
 @Controller('user')
 export class UserController {
@@ -11,8 +12,8 @@ export class UserController {
     return this.userService.getById(req.user.id);
   }
   @Get('')
-  async get() {
-    return await this.userService.getAll();
+  async get(@Query() { page, limit }: PaginationParams) {
+    return await this.userService.getAll(page, limit);
   }
   @Get(':id')
   async getOne(@Param('id') id: string) {

@@ -38,7 +38,7 @@ export class UserService {
     }
   }
 
-  async getAll() {
+  async getAll(page?: number, limit?: number) {
     return await this.userRepository.getAll();
   }
 
