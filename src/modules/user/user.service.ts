@@ -39,7 +39,7 @@ export class UserService {
   }
 
   async getAll(page?: number, limit?: number) {
-    return await this.userRepository.getAll();
+    return await this.userRepository.getAll(page, limit);
   }
 
   async addRoleToUser(addRoleToUserDto: AddRoleToUserDto) {

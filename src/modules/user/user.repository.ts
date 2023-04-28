@@ -4,7 +4,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { hashPasword } from 'src/common/utils/bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { calculatePagination } from 'src/common/utils/calculatePagination';
-import { MediaPostEntity } from '../media-post/entities/media-post.entity';
 import { RolesEnum } from 'src/common/enums/roles.enum';
 
 @Injectable()
