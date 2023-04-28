@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MediaPostEntity } from './entities/media-post.entity';
 import { calculatePagination } from 'src/common/utils/calculatePagination';
-import { log } from 'console';
 
 @Injectable()
 export class MediaPostRepository {
@@ -113,18 +112,19 @@ export class MediaPostRepository {
           id,
         },
       });
-    if (canditateToBlockedPost.creatorId !== creatorId)
-      throw new BadRequestException(`You aren't the creator`);
-    const blockedPost = await this.prismaService.mediaPost.update({
-      where: {
-        id,
-      },
-      data: {
-        blockedUsers: {
-          connect: { id: blockedUserId },
+    if (canditateToBlockedPost.creatorId === creatorId) {
+      const blockedPost = await this.prismaService.mediaPost.update({
+        where: {
+          id,
         },
-      },
-    });
-    return MediaPostEntity.fromObject(blockedPost);
+        data: {
+          blockedUsers: {
+            connect: { id: blockedUserId },
+          },
+        },
+      });
+      return MediaPostEntity.fromObject(blockedPost);
+    }
+    throw new BadRequestException(`You aren't the creator`);
   }
 }

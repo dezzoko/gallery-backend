@@ -9,40 +9,30 @@ generator client {
 }
 
 model User {
-    id                        Int               @id @default(autoincrement())
-    email                     String            @unique
+    id                        Int            @id @default(autoincrement())
+    email                     String         @unique
     name                      String
     password                  String
     surname                   String?
     currentHashedRefreshToken String?
     MediaPost                 MediaPost[]
-    blockedPosts              BlockedUserPost[]
-    blocker                   BlockedUsers[]    @relation("blocker")
-    blocked                   BlockedUsers[]    @relation("blocked")
+    blockedPosts              MediaPost[]    @relation("blocked-user-post")
+    blocker                   BlockedUsers[] @relation("blocker")
+    blocked                   BlockedUsers[] @relation("blocked")
     roles                     Roles[]
 }
 
 model MediaPost {
-    id           Int               @id @default(autoincrement())
+    id           Int     @id @default(autoincrement())
     title        String
     contentUrl   String
     description  String
-    creator      User              @relation(fields: [creatorId], references: [id])
+    creator      User    @relation(fields: [creatorId], references: [id])
     creatorId    Int
-    isBlocked    Boolean           @default(false)
-    blockedUsers BlockedUserPost[]
+    isBlocked    Boolean @default(false)
+    blockedUsers User[]  @relation("blocked-user-post")
 
     @@map("mediaPost")
-}
-
-model BlockedUserPost {
-    id          Int       @id @default(autoincrement())
-    blockedUser User      @relation(fields: [blockedId], references: [id])
-    blockedId   Int
-    MediaPost   MediaPost @relation(fields: [mediaPostId], references: [id])
-    mediaPostId Int
-
-    @@map("blockedUserPost")
 }
 
 model BlockedUsers {

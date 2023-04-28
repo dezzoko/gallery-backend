@@ -1,5 +1,4 @@
 import { UserEntity } from 'src/modules/user/entities/user.entity';
-
 export class MediaPostEntity {
   constructor(
     public id: number,

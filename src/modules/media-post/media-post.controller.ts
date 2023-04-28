@@ -45,10 +45,10 @@ export class MediaPostController {
   async blockMediaPost(@Param('id') id: string, @Req() req: RequestWithUser) {
     return await this.mediaPostService.blockMediaPost(+id, req.user.id);
   }
-  @Patch(':id/block/:user-id')
+  @Patch(':id/block/:userId')
   async blockPostForUser(
     @Param('id') mediaPostId: string,
-    @Param('user-id') userId: string,
+    @Param('userId') userId: string,
     @Req() req: RequestWithUser,
   ) {
     const mediaPostIdNum = parseInt(mediaPostId, 10);
