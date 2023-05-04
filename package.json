@@ -14,7 +14,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
-    "prisma-studio": "dotenv -e .dev.env npx prisma studio",
+    "prisma-studio": "dotenv -e .docker.env npx prisma studio",
     "migrate": "dotenv -e .dev.env npx prisma migrate dev --preview-feature && prisma generate",
     "prisma-generate": "dotenv -e .dev.env npx prisma generate",
     "test:watch": "jest --watch",
