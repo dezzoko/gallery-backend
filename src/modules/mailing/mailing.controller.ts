@@ -1,6 +1,7 @@
 import { Controller, Get, HttpStatus, Query, Req } from '@nestjs/common';
 import { MailingService } from './mailing.service';
 import RequestWithUser from 'src/common/interfaces/request-with-user';
+import { NoJwtAuth } from 'src/common/decorators/no-auth.decorator';
 
 @Controller('mailing')
 export class MailingController {

@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpCode,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
 import { google } from 'googleapis';
@@ -59,6 +65,7 @@ export class MailingService {
       });
     } catch (e) {
       console.log(e);
+      throw new BadRequestException('Something went wrong with email');
     }
   }
   public sendVerificationLink(email: string) {
@@ -76,12 +83,10 @@ export class MailingService {
       'EMAIL_CONFIRMATION_URL',
     )}?token=${token}`;
 
-    const text = `Welcome to the application. To confirm the email address, click here: ${url}`;
-
     return this.sendMail({
       to: email,
       subject: 'Email confirmation',
-      text,
+      text: url,
     });
   }
   public async decodeConfirmationToken(token: string) {
@@ -114,12 +119,26 @@ export class MailingService {
     return user;
   }
   public async sendMail(sendMailDto: SendMailDto) {
+    console.log(sendMailDto.text);
+
     await this.setTransport();
-    this.mailerService.sendMail({
-      transporterName: 'gmail',
-      to: sendMailDto.to,
-      subject: sendMailDto.subject,
-      text: sendMailDto.text,
-    });
+    this.mailerService
+      .sendMail({
+        transporterName: 'gmail',
+        to: sendMailDto.to,
+        subject: sendMailDto.subject,
+        template: 'action',
+        context: {
+          link: sendMailDto.text,
+        },
+      })
+      .then((success) => {
+        return HttpStatus.OK;
+      })
+      .catch((err) => {
+        return new ForbiddenException(
+          'somethin went wrong with sending mail' + err,
+        );
+      });
   }
 }

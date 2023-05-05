@@ -21,9 +21,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
       isGlobal: true,
       load: [authConfig],
     }),
-    MailerModule.forRoot({
-      transport: 'smtps://user@domain.com:pass@smtp.domain.com',
-    }),
     PrismaModule,
     MediaPostModule,
     UserModule,
