@@ -1,9 +1,12 @@
 import {
   BadRequestException,
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
+  Post,
   Query,
   Req,
   Res,
@@ -14,6 +17,9 @@ import { Response } from 'express';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { EMAIL_CONFIRMED } from 'src/common/constants/roles';
 import { PaginationParams } from 'src/common/interfaces/pagination';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateMediaPostDto } from './dto/create-media-post.dto';
+@ApiTags('MediaPost')
 @Controller('media-post')
 export class MediaPostController {
   constructor(private readonly mediaPostService: MediaPostService) {}
@@ -31,16 +37,32 @@ export class MediaPostController {
     return await this.mediaPostService.findSelfPost(req.user.id, page, limit);
   }
 
-  @Get(':id')
-  async getPostById(
-    @Param('id') id: string,
-    @Req() req: RequestWithUser,
-    @Res() res: Response,
-  ) {
-    if (req.user.id === +id) res.redirect('self-posts');
-    return await this.mediaPostService.findByUserId(+id);
+  @Get('user/:userId')
+  async getPostByUserId(@Param('userId') userId: string) {
+    const userIdNum = parseInt(userId, 10);
+    if (isNaN(userIdNum)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+    return await this.mediaPostService.findByUserId(userIdNum);
   }
 
+  @Post()
+  async createMediaPost(
+    @Body() mediaPost: CreateMediaPostDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return await this.mediaPostService.createMediaPost(mediaPost, req.user.id);
+  }
+  @Delete('/:mediaPostId')
+  async deleteMediaPostById(
+    @Param('mediaPostId') mediaPostId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const mediaPostIdNum = parseInt(mediaPostId);
+    if (isNaN(mediaPostIdNum))
+      throw new BadRequestException('Invalid mediaPost ID');
+    return await this.mediaPostService.deletePost(mediaPostIdNum, req.user.id);
+  }
   @Patch('block/:id')
   async blockMediaPost(@Param('id') id: string, @Req() req: RequestWithUser) {
     return await this.mediaPostService.blockMediaPost(+id, req.user.id);

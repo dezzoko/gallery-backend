@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MediaPostEntity } from './entities/media-post.entity';
 import { calculatePagination } from 'src/common/utils/calculatePagination';
+import { CreateMediaPostDto } from './dto/create-media-post.dto';
 
 @Injectable()
 export class MediaPostRepository {
@@ -41,6 +46,34 @@ export class MediaPostRepository {
     };
   }
 
+  async create(mediaPost: CreateMediaPostDto, userId: number) {
+    const createdMediaPost = await this.prismaService.mediaPost.create({
+      data: {
+        ...mediaPost,
+        creator: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    return createdMediaPost;
+  }
+
+  async delete(id: number, userId: number) {
+    const mediaPost = await this.prismaService.mediaPost.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (mediaPost.creatorId !== userId) throw new ForbiddenException();
+    await this.prismaService.mediaPost.delete({
+      where: {
+        id: id,
+      },
+    });
+  }
   async getSelfUserPosts(userId: number, page?: number, limit?: number) {
     const { take, skip } = calculatePagination(limit, page);
 
@@ -106,13 +139,16 @@ export class MediaPostRepository {
   }
 
   async blockPostForUser(id: number, blockedUserId: number, creatorId: number) {
-    const canditateToBlockedPost =
+    const candidateToBlockedPost =
       await this.prismaService.mediaPost.findUnique({
         where: {
           id,
         },
       });
-    if (canditateToBlockedPost.creatorId === creatorId) {
+
+    console.log(candidateToBlockedPost);
+
+    if (candidateToBlockedPost.creatorId === creatorId) {
       const blockedPost = await this.prismaService.mediaPost.update({
         where: {
           id,

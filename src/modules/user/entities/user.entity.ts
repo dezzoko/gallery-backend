@@ -7,6 +7,7 @@ export class UserEntity {
     public password: string,
     public currentHashedRefreshToken: string,
     public roles: string[],
+    public blockedUsers: UserEntity[],
   ) {}
 
   static fromObject(object: any) {
@@ -20,7 +21,12 @@ export class UserEntity {
     }
     let roles: string[];
     if (object.roles) roles = object.roles.map((role) => role.roleName);
+    let blockedUsers: UserEntity[];
 
+    if (object.blockedUsers)
+      blockedUsers = object.blockedUsers.map((blockedUser) =>
+        UserEntity.fromObject(blockedUser),
+      );
     return new UserEntity(
       object.id,
       object.name,
@@ -29,6 +35,7 @@ export class UserEntity {
       object.password,
       object?.currentHashedRefreshToken,
       roles,
+      blockedUsers,
     );
   }
 }

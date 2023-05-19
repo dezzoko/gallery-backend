@@ -52,4 +52,8 @@ export class UserService {
   async createUser(createUserDto: CreateUserDto) {
     return await this.userRepository.create(createUserDto);
   }
+
+  async blockUser(userId: number, blockerId: number) {
+    return await this.userRepository.block(userId, blockerId);
+  }
 }

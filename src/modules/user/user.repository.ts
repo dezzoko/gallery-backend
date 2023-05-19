@@ -17,10 +17,20 @@ export class UserRepository {
       },
       include: {
         roles: true,
+        blocker: {
+          select: {
+            blockedUser: true,
+          },
+        },
       },
     });
+    const userEntity = {
+      ...user,
+      blockedUsers: user.blocker.map((blockedUser) => blockedUser.blockedUser),
+    };
+    delete userEntity.blocker;
 
-    return UserEntity.fromObject(user);
+    return UserEntity.fromObject(userEntity);
   }
 
   async addRoleToUser(userId: number, roleName: string) {
@@ -109,5 +119,20 @@ export class UserRepository {
 
     this.addRoleToUser(user.id, RolesEnum.INTERNAL_USER);
     return UserEntity.fromObject(user);
+  }
+
+  async block(id: number, blockerId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) throw new BadRequestException('There is no user with such id');
+    const blocked = await this.prismaService.blockedUsers.create({
+      data: {
+        blockedId: id,
+        blockerId: blockerId,
+      },
+    });
+    console.log(blocked);
   }
 }
