@@ -1,7 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { hashPasword } from 'src/common/utils/bcrypt';
+import { hashPassword } from 'src/common/utils/bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { calculatePagination } from 'src/common/utils/calculatePagination';
 import { RolesEnum } from 'src/common/enums/roles.enum';
@@ -54,11 +58,27 @@ export class UserRepository {
     }
   }
 
-  async getAll(page?: number, limit?: number) {
-    const { take, skip } = calculatePagination(limit, page);
+  async getAll(userId: number, page?: number, limit?: number) {
+    const currentUser = await this.prismaService.blockedUsers.findMany({
+      where: {
+        blockedId: userId,
+      },
+    });
 
+    console.log(currentUser);
+
+    const { take, skip } = calculatePagination(limit, page);
     const [users, total] = await Promise.all([
       await this.prismaService.user.findMany({
+        where: {
+          NOT: {
+            blocker: {
+              some: {
+                blockedId: userId,
+              },
+            },
+          },
+        },
         skip,
         take,
         include: {
@@ -69,7 +89,17 @@ export class UserRepository {
           },
         },
       }),
-      this.prismaService.user.count(),
+      this.prismaService.user.count({
+        where: {
+          NOT: {
+            blocker: {
+              some: {
+                blockedId: userId,
+              },
+            },
+          },
+        },
+      }),
     ]);
     const totalPages = Math.ceil(total / limit);
     if (!users.length) {
@@ -99,7 +129,7 @@ export class UserRepository {
     }
   }
   async setCurrentRefreshToken(refreshToken: string, userId: number) {
-    const currentHashedRefreshToken = await hashPasword(refreshToken);
+    const currentHashedRefreshToken = await hashPassword(refreshToken);
 
     await this.prismaService.user.update({
       where: { id: userId },
@@ -126,13 +156,23 @@ export class UserRepository {
       where: { id },
     });
 
-    if (!user) throw new BadRequestException('There is no user with such id');
-    const blocked = await this.prismaService.blockedUsers.create({
+    if (!user) throw new NotFoundException('There is no user with such id');
+    await this.prismaService.blockedUsers.create({
       data: {
         blockedId: id,
         blockerId: blockerId,
       },
     });
-    console.log(blocked);
+  }
+
+  async setAvatar(avatarName: string, id: number) {
+    await this.prismaService.user.update({
+      where: {
+        id,
+      },
+      data: {
+        avatar: avatarName,
+      },
+    });
   }
 }

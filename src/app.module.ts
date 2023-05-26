@@ -12,7 +12,8 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { MailingController } from './modules/mailing/mailing.controller';
 import { MailingService } from './modules/mailing/mailing.service';
 import { MailingModule } from './modules/mailing/mailing.module';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { MinioModule } from './modules/minio/minio.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -26,6 +27,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     UserModule,
     AuthModule,
     MailingModule,
+    MinioModule,
+    AdminModule,
   ],
   controllers: [MailingController],
   providers: [
