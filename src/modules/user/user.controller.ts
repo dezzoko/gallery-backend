@@ -8,12 +8,15 @@ import {
   Post,
   Query,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import RequestWithUser from 'src/common/interfaces/request-with-user';
 import { PaginationParams } from 'src/common/interfaces/pagination';
 import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
@@ -23,12 +26,26 @@ export class UserController {
     return this.userService.getById(req.user.id);
   }
   @Get('')
-  async get(@Query() { page, limit }: PaginationParams) {
-    return await this.userService.getAll(page, limit);
+  async getAll(
+    @Query() { page, limit }: PaginationParams,
+    @Req() req: RequestWithUser,
+  ) {
+    console.log(req.user.id);
+
+    return await this.userService.getAll(req.user.id, page, limit);
   }
   @Get(':id')
   async getOne(@Param('id') id: string) {
     return await this.userService.getById(+id);
+  }
+
+  @Post('upload-avatar')
+  @UseInterceptors(FileInterceptor('avatar'))
+  async uploadAvatar(
+    @UploadedFile('avatar') avatar: Express.Multer.File,
+    @Req() req: RequestWithUser,
+  ) {
+    return await this.userService.uploadAvatar(avatar, req.user.id);
   }
 
   @Get('email/:email')

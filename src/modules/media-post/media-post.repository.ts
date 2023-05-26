@@ -7,21 +7,27 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { MediaPostEntity } from './entities/media-post.entity';
 import { calculatePagination } from 'src/common/utils/calculatePagination';
 import { CreateMediaPostDto } from './dto/create-media-post.dto';
+import { use } from 'passport';
 
 @Injectable()
 export class MediaPostRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getAll(page?: number, limit?: number) {
+  async getAll(userId: number, page?: number, limit?: number) {
     const { take, skip } = calculatePagination(limit, page);
-
     const [posts, total] = await Promise.all([
       await this.prismaService.mediaPost.findMany({
         skip,
         take,
         where: {
           isBlocked: false,
+          blockedUsers: {
+            none: {
+              id: userId,
+            },
+          },
         },
+
         include: {
           creator: true,
         },
@@ -29,6 +35,11 @@ export class MediaPostRepository {
       this.prismaService.mediaPost.count({
         where: {
           isBlocked: false,
+          blockedUsers: {
+            none: {
+              id: userId,
+            },
+          },
         },
       }),
     ]);
@@ -46,19 +57,24 @@ export class MediaPostRepository {
     };
   }
 
-  async create(mediaPost: CreateMediaPostDto, userId: number) {
+  async create(mediaPost: CreateMediaPostDto, file: string, userId: number) {
     const createdMediaPost = await this.prismaService.mediaPost.create({
       data: {
         ...mediaPost,
+        contentUrl: file,
         creator: {
           connect: {
             id: userId,
           },
         },
       },
+      include: {
+        creator: true,
+      },
     });
+    console.log(createdMediaPost);
 
-    return createdMediaPost;
+    return MediaPostEntity.fromObject(createdMediaPost);
   }
 
   async delete(id: number, userId: number) {
@@ -118,21 +134,21 @@ export class MediaPostRepository {
     return posts.map((post) => MediaPostEntity.fromObject(post));
   }
   async blockMediaPost(id: number, userId: number) {
-    const canditateToBlockedPost =
+    const candidateToBlockedPost =
       await this.prismaService.mediaPost.findUnique({
         where: {
           id,
         },
       });
 
-    if (canditateToBlockedPost.creatorId !== userId)
+    if (candidateToBlockedPost.creatorId !== userId)
       throw new BadRequestException(`You aren't the creator`);
     const blockedPost = await this.prismaService.mediaPost.update({
       where: {
         id,
       },
       data: {
-        isBlocked: !canditateToBlockedPost.isBlocked,
+        isBlocked: !candidateToBlockedPost.isBlocked,
       },
     });
     return MediaPostEntity.fromObject(blockedPost);

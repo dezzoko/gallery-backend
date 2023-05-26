@@ -14,6 +14,7 @@ services:
     command: npm run start:dev
     depends_on:
       - postgres
+      - minio
     restart: always
     networks:
       - postgres
@@ -26,6 +27,22 @@ services:
       - /data/postgres:/data/postgres
     env_file:
       - .dev.env
+    networks:
+      - postgres
+  minio:
+    container_name: minio
+    image: docker.io/bitnami/minio:2022
+    env_file:
+      - .dev.env
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: minio server --console-address ":9001" /data
+    volumes:
+      - 'minio_data:/data'
     networks:
       - postgres
 
@@ -46,3 +63,7 @@ services:
 networks:
   postgres:
     driver: bridge
+
+volumes:
+  minio_data:
+    driver: local

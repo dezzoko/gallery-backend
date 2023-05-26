@@ -15,6 +15,7 @@ model User {
     password                  String
     surname                   String?
     currentHashedRefreshToken String?
+    avatar                    String?
     MediaPost                 MediaPost[]
     blockedPosts              MediaPost[]    @relation("blocked-user-post")
     blocker                   BlockedUsers[] @relation("blocker")

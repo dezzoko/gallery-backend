@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { RemoveFieldsInterceptor } from './common/interceptors/remove-fields.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { MinioService } from './modules/minio/minio.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,7 +18,8 @@ async function bootstrap() {
     .setDescription('gallery-api with permissions')
     .setVersion('1.0')
     .build();
-
+  const minioService = app.get<MinioService>(MinioService);
+  await minioService.createBucket();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
   await app.listen(3000);

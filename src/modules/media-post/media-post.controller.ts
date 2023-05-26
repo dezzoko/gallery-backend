@@ -10,6 +10,8 @@ import {
   Query,
   Req,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { MediaPostService } from './media-post.service';
 import RequestWithUser from 'src/common/interfaces/request-with-user';
@@ -19,13 +21,17 @@ import { EMAIL_CONFIRMED } from 'src/common/constants/roles';
 import { PaginationParams } from 'src/common/interfaces/pagination';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateMediaPostDto } from './dto/create-media-post.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 @ApiTags('MediaPost')
 @Controller('media-post')
 export class MediaPostController {
   constructor(private readonly mediaPostService: MediaPostService) {}
   @Get('')
-  async getAll(@Query() { page, limit }: PaginationParams) {
-    return await this.mediaPostService.findAll(page, limit);
+  async getAll(
+    @Query() { page, limit }: PaginationParams,
+    @Req() req: RequestWithUser,
+  ) {
+    return await this.mediaPostService.findAll(req.user.id, page, limit);
   }
 
   @Roles(EMAIL_CONFIRMED)
@@ -47,11 +53,17 @@ export class MediaPostController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
   async createMediaPost(
     @Body() mediaPost: CreateMediaPostDto,
     @Req() req: RequestWithUser,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return await this.mediaPostService.createMediaPost(mediaPost, req.user.id);
+    return await this.mediaPostService.createMediaPost(
+      mediaPost,
+      file,
+      req.user.id,
+    );
   }
   @Delete('/:mediaPostId')
   async deleteMediaPostById(

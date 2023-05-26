@@ -1,4 +1,4 @@
-import { comparePassword, hashPasword } from 'src/common/utils/bcrypt';
+import { comparePassword, hashPassword } from 'src/common/utils/bcrypt';
 import { UserService } from '../user/user.service';
 import { SignupDto } from './dto/sign-up.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
@@ -42,7 +42,7 @@ export class AuthService {
   }
 
   public async signUp(signUpDto: SignupDto) {
-    const hashedPassword = await hashPasword(signUpDto.password);
+    const hashedPassword = await hashPassword(signUpDto.password);
     delete signUpDto.confirmPassword;
     try {
       const createdUser = await this.userService.createUser({

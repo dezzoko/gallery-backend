@@ -1,11 +1,7 @@
-import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
-//TODO: delete isOptional and add Minio
+import { IsString } from 'class-validator';
 export class CreateMediaPostDto {
   @IsString()
   title: string;
-  @IsOptional()
-  contentUrl: string;
   @IsString()
   description: string;
 }

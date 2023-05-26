@@ -1,13 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { USER_REPOSITORY } from 'src/common/constants/tokens';
 import { CreateUserDto } from './dto/create-user.dto';
 import { compare } from 'bcrypt';
 import { AddRoleToUserDto } from './dto/addRoleToUserDto.dto';
+import { BucketNames, MinioService } from '../minio/minio.service';
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly minioService: MinioService,
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
   ) {}
 
@@ -16,6 +18,16 @@ export class UserService {
       refreshToken,
       userId,
     );
+  }
+
+  async uploadAvatar(avatar: Express.Multer.File, userId: number) {
+    if (!avatar.mimetype.includes('image'))
+      throw new BadRequestException('incorrect format');
+    const avatarName = await this.minioService.uploadFile(
+      avatar,
+      BucketNames.avatars,
+    );
+    return await this.userRepository.setAvatar(avatarName, userId);
   }
   async getById(id: number) {
     return await this.userRepository.getById(id);
@@ -38,8 +50,8 @@ export class UserService {
     }
   }
 
-  async getAll(page?: number, limit?: number) {
-    return await this.userRepository.getAll(page, limit);
+  async getAll(userId: number, page?: number, limit?: number) {
+    return await this.userRepository.getAll(userId, page, limit);
   }
 
   async addRoleToUser(addRoleToUserDto: AddRoleToUserDto) {
