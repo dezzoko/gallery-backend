@@ -16,8 +16,6 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
   public getCookieWithJwtAccessToken(userId: number) {
-    console.log(this.configService.get('auth.accessTokenExpiresIn'));
-
     const payload: TokenPayload = { userId };
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('auth.secretAccessToken'),

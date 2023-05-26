@@ -17,7 +17,8 @@ import { UserService } from '../user/user.service';
 import JwtRefreshGuard from 'src/common/guards/jwt-refresh.guard';
 import { MailingService } from '../mailing/mailing.service';
 import { NoJwtAuth } from 'src/common/decorators/no-auth.decorator';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
