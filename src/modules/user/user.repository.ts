@@ -15,6 +15,8 @@ export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getById(id: number) {
+    console.log(id, 'ID UNIQUE BLA BLA');
+
     const user = await this.prismaService.user.findUnique({
       where: {
         id: id,
@@ -59,14 +61,6 @@ export class UserRepository {
   }
 
   async getAll(userId: number, page?: number, limit?: number) {
-    const currentUser = await this.prismaService.blockedUsers.findMany({
-      where: {
-        blockedId: userId,
-      },
-    });
-
-    console.log(currentUser);
-
     const { take, skip } = calculatePagination(limit, page);
     const [users, total] = await Promise.all([
       await this.prismaService.user.findMany({
