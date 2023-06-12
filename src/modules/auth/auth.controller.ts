@@ -29,7 +29,7 @@ export class AuthController {
   @NoJwtAuth()
   @Post('register')
   async register(@Body() signUpDto: SignupDto) {
-    await this.mailingService.sendVerificationLink(signUpDto.email);
+    // await this.mailingService.sendVerificationLink(signUpDto.email);
     return await this.authService.signUp(signUpDto);
   }
 
@@ -57,13 +57,14 @@ export class AuthController {
   @NoJwtAuth()
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
-  refresh(@Req() request: RequestWithUser) {
+  async refresh(@Req() request: RequestWithUser) {
+    const { user } = request;
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
-      request.user.id,
+      user.id,
     );
 
     request.res.setHeader('Set-Cookie', accessTokenCookie);
-    return request.user;
+    return user;
   }
 
   @Post('logout')

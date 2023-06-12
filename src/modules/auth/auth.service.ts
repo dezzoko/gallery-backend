@@ -45,12 +45,12 @@ export class AuthService {
     const hashedPassword = await hashPassword(signUpDto.password);
     delete signUpDto.confirmPassword;
     try {
-      const createdUser = await this.userService.createUser({
+      await this.userService.createUser({
         ...signUpDto,
         password: hashedPassword,
       });
 
-      return createdUser;
+      return HttpStatus.NO_CONTENT;
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new HttpException(

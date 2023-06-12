@@ -24,14 +24,15 @@ model User {
 }
 
 model MediaPost {
-    id           Int     @id @default(autoincrement())
+    id           Int       @id @default(autoincrement())
     title        String
     contentUrl   String
     description  String
-    creator      User    @relation(fields: [creatorId], references: [id])
+    creator      User      @relation(fields: [creatorId], references: [id])
     creatorId    Int
-    isBlocked    Boolean @default(false)
-    blockedUsers User[]  @relation("blocked-user-post")
+    isBlocked    Boolean   @default(false)
+    blockedUsers User[]    @relation("blocked-user-post")
+    deletedAt    DateTime? @db.Timestamptz
 
     @@map("mediaPost")
 }
