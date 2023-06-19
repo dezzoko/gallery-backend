@@ -59,17 +59,30 @@ export class AuthController {
   @Get('refresh')
   async refresh(@Req() request: RequestWithUser) {
     const { user } = request;
+    const { cookie: refreshTokenCookie, token: refreshToken } =
+      this.authService.getCookieWithJwtRefreshToken(user.id);
+
+    await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
       user.id,
     );
 
-    request.res.setHeader('Set-Cookie', accessTokenCookie);
+    request.res.setHeader('Set-Cookie', [
+      accessTokenCookie,
+      refreshTokenCookie,
+    ]);
     return user;
   }
-
-  @Post('logout')
-  async logout(@Req() request: RequestWithUser, @Res() response: Response) {
+  @NoJwtAuth()
+  @UseGuards(JwtRefreshGuard)
+  @Get('validate-refresh-token')
+  async validateRefreshToken() {
+    return true;
+  }
+  @Get('logout')
+  logout(@Req() request: RequestWithUser, @Res() response: Response) {
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
-    return response.sendStatus(200);
+    return true;
   }
 }

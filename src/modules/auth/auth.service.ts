@@ -78,7 +78,12 @@ export class AuthService {
     }
   }
   public getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+    console.log('ENTERED');
+
+    return [
+      `Authentication=; HttpOnly; Path=/; Max-Age=0`,
+      `Refresh=; HttpOnly; Path=/; Max-Age=0`,
+    ];
   }
 
   private verifyPassword(plainTextPassword: string, hashedPassword: string) {

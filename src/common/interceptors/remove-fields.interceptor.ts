@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
+import { log } from 'console';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -29,6 +30,7 @@ export class RemoveFieldsInterceptor implements NestInterceptor {
     if (typeof body !== 'object' || body === null) {
       return;
     }
+    console.log(body, 'INTERCEPTOR');
 
     for (const key in body) {
       if (this.fieldsToRemove.includes(key)) {
