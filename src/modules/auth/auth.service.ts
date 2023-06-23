@@ -78,8 +78,6 @@ export class AuthService {
     }
   }
   public getCookieForLogOut() {
-    console.log('ENTERED');
-
     return [
       `Authentication=; HttpOnly; Path=/; Max-Age=0`,
       `Refresh=; HttpOnly; Path=/; Max-Age=0`,

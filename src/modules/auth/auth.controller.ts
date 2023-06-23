@@ -80,9 +80,9 @@ export class AuthController {
   async validateRefreshToken() {
     return true;
   }
-  @Get('logout')
-  logout(@Req() request: RequestWithUser, @Res() response: Response) {
+  @Post('logout')
+  async logout(@Req() request: RequestWithUser, @Res() response: Response) {
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
-    return true;
+    response.status(200).json({ message: 'Logout successful' }); // отправить ответ в формате JSON
   }
 }
