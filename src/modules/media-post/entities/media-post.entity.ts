@@ -10,22 +10,17 @@ export class MediaPostEntity {
   ) {}
 
   static fromObject(object: any) {
-    if (
-      !object.id ||
-      !object.title ||
-      !object.description ||
-      (!object.creator && !object.creatorId)
-    ) {
+    if (!object.id || !object.title || (!object.creator && !object.creatorId)) {
       throw new Error('cannot make MediaPostEntity from object');
     }
     let user;
-
+    //
     if (object.creator) user = UserEntity.fromObject(object.creator);
-
+    object.contentUrl = `http://localhost:${process.env.PORT}/minio/media/${object.contentUrl}`;
     return new MediaPostEntity(
       object.id,
       object.title,
-      object.description,
+      object.description || null,
       user || null,
       object.contentUrl,
       object.isBlocked,

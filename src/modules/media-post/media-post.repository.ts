@@ -49,7 +49,7 @@ export class MediaPostRepository {
     }
 
     return {
-      posts: posts.map((post) => MediaPostEntity.fromObject(post)),
+      data: posts.map((post) => MediaPostEntity.fromObject(post)),
       page,
       limit,
       total,
@@ -72,7 +72,6 @@ export class MediaPostRepository {
         creator: true,
       },
     });
-    console.log(createdMediaPost);
 
     return MediaPostEntity.fromObject(createdMediaPost);
   }
